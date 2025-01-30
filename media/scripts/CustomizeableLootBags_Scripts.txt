@@ -17,4 +17,12 @@ module Base
         WorldStaticModel = CustomizeableLootBags,
     }
 
+	item LootBagRecorder
+    {
+        DisplayName	=	Loot Bag Recorder,
+        DisplayCategory = Junk,
+        Weight	=	0.1,
+        Type	=	Normal,
+        Icon	=	MysteryLootBag_White,
+    }
 }

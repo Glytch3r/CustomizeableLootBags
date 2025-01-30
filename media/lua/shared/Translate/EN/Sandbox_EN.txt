@@ -13,4 +13,10 @@ Sandbox_EN = {
 
 	Sandbox_CustomizeableLootBags_ShowContentsTooltip = "Show Contents Tooltip",
 
+	Sandbox_CustomizeableLootBags_CanUseAllIcons = "Can Use All Icons",
+	Sandbox_CustomizeableLootBags_CanUseAllIcons_tooltip = "Admins can pick any icons when setting loot bags",
+
+	Sandbox_CustomizeableLootBags_DeleteOriginalBag = "Delete Original Bag",
+	Sandbox_CustomizeableLootBags_DeleteOriginalBag_tooltip = "Despawns the InventoryContainer after creating the Loot Bag item",
 }
+
