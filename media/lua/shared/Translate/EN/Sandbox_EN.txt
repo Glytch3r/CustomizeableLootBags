@@ -1,0 +1,16 @@
+
+
+Sandbox_EN = {
+
+
+	Sandbox_CustomizeableLootBags = "Customizeable Loot Bags",
+
+	Sandbox_CustomizeableLootBags_ItemSpawnChance = "Item Spawn Chance",
+	Sandbox_CustomizeableLootBags_ItemSpawnChance_tooltip = "Set to 100 to guarantee spawn",
+
+	Sandbox_CustomizeableLootBags_MaxItemSpawn = "Max Item Spawn",
+	Sandbox_CustomizeableLootBags_MaxItemSpawn_tooltip = "Limits the number of items to spawn",
+
+	Sandbox_CustomizeableLootBags_ShowContentsTooltip = "Show Contents Tooltip",
+
+}

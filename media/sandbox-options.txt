@@ -1,0 +1,20 @@
+VERSION = 1,
+
+option CustomizeableLootBags.ItemSpawnChance
+{
+	type = double, min = 0, max = 100, default = 50,
+	page = CustomizeableLootBags, translation = CustomizeableLootBags_ItemSpawnChance,
+}
+
+option CustomizeableLootBags.MaxItemSpawn
+{
+	type = integer, min = 0, max = 999, default = 5,
+	page = CustomizeableLootBags, translation = CustomizeableLootBags_MaxItemSpawn,
+}
+
+option CustomizeableLootBags.ShowContentsTooltip
+{
+	type = boolean, default = true,
+	page = CustomizeableLootBags, translation = CustomizeableLootBags_ShowContentsTooltip,
+}
+
