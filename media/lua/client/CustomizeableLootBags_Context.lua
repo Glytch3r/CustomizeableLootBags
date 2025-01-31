@@ -117,7 +117,6 @@ function CustomizeableLootBags.invContext(player, context, items)
 					dupRec.iconTexture = getTexture("media/ui/MysteryLootBag_Dup.png")
 					local opt = ISContextMenu:getNew(context)
 					context:addSubMenu(dupRec, opt)
-					MysteryLootBag_Dup
 					opt:addOption("[ x1 ]", worldobjects, function()
 						CustomizeableLootBags.duplicateRecord(recorder, 1)
 					end)
