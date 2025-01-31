@@ -48,6 +48,7 @@ function CustomizeableLootBags.trimStr(str)
         return str
     end
 end
+
 function CustomizeableLootBags.duplicateRecord(recorder, qty)
     getSoundManager():playUISound("UIActivateMainMenuItem")
     local showTip = SandboxVars.CustomizeableLootBags.ShowContentsTooltip or true

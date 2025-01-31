@@ -112,26 +112,32 @@ function CustomizeableLootBags.invContext(player, context, items)
                 end
 
                 if recorder then
+					local isHasRecord = CustomizeableLootBags.isHasLootBagData(recorder)
 
 					local dupRec = context:addOptionOnTop("Duplicate Recorder: ")
-					dupRec.iconTexture = getTexture("media/ui/MysteryLootBag_Dup.png")
+
 					local opt = ISContextMenu:getNew(context)
 					context:addSubMenu(dupRec, opt)
-					opt:addOption("[ x1 ]", worldobjects, function()
-						CustomizeableLootBags.duplicateRecord(recorder, 1)
-					end)
-					opt:addOption("[ x2 ]", worldobjects, function()
-						CustomizeableLootBags.duplicateRecord(recorder, 2)
-					end)
-					opt:addOption("[ x5 ]", worldobjects, function()
-						CustomizeableLootBags.duplicateRecord(recorder, 5)
-					end)
-					opt:addOption("[ x10 ]", worldobjects, function()
-						CustomizeableLootBags.duplicateRecord(recorder, 10)
-					end)
-					opt:addOption("[ x25 ]", worldobjects, function()
-						CustomizeableLootBags.duplicateRecord(recorder, 25)
-					end)
+					if not isHasRecord then
+						dupRec.notAvailable = true
+						dupRec.iconTexture = getTexture("media/ui/MysteryLootBag_Dup.png")
+
+						local tip = ISInventoryPaneContextMenu.addToolTip()
+						tip.description = "NO RECORD FOUND"
+						dupRec.toolTip = tip
+
+					else
+						dupRec.iconTexture = getTexture("media/ui/MysteryLootBag_Red.png")
+					end
+					local duplicateOptions = {1, 2, 5, 10, 25}
+					for _, qty in ipairs(duplicateOptions) do
+						local optTip = opt:addOption("[ x" .. tostring(qty) .. " ]", worldobjects, function()
+							CustomizeableLootBags.duplicateRecord(recorder, tonumber(qty))
+						end)
+						if not isHasRecord then
+							optTip.notAvailable = true
+						end
+					end
 
 					if bag and CustomizeableLootBags.isBag(bag) then
 						local submenu = context:addOptionOnTop("Set Loot Bag: " .. tostring(dispName))

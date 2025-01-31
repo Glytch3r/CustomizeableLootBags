@@ -43,3 +43,7 @@ function CustomizeableLootBags.isLootBag(ref)
     return modData and modData.isTemplate == nil
 end
 
+function CustomizeableLootBags.isHasLootBagData(ref)
+    local modData = ref:getModData()['LootBagData']
+    return modData and modData.isTemplate == nil
+end
