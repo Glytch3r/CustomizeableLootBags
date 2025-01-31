@@ -13,10 +13,18 @@ Sandbox_EN = {
 
 	Sandbox_CustomizeableLootBags_ShowContentsTooltip = "Show Contents Tooltip",
 
-	Sandbox_CustomizeableLootBags_CanUseAllIcons = "Can Use All Icons",
-	Sandbox_CustomizeableLootBags_CanUseAllIcons_tooltip = "Admins can pick any icons when setting loot bags",
-
 	Sandbox_CustomizeableLootBags_DeleteOriginalBag = "Delete Original Bag",
 	Sandbox_CustomizeableLootBags_DeleteOriginalBag_tooltip = "Despawns the InventoryContainer after creating the Loot Bag item",
+
+
+	Sandbox_CustomizeableLootBags_SetIconMode = "Set Icon Mode",
+	Sandbox_CustomizeableLootBags_SetIconMode_tooltip = "Admins ability to pick icons when setting loot bags",
+	Sandbox_CustomizeableLootBags_SetIconMode_option1 = "InventoryContainers Only",
+	Sandbox_CustomizeableLootBags_SetIconMode_option2 = "Can Use All Icons",
+	Sandbox_CustomizeableLootBags_SetIconMode_option3 = "Auto Set",
+
+	Sandbox_CustomizeableLootBags_BlackList = "Blacklist",
+	Sandbox_CustomizeableLootBags_BlackList_tooltip = "Exclude blacklisted items when creating LootBagData . Use ; as delimiter",
+
 }
 

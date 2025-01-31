@@ -27,107 +27,32 @@
 
 CustomizeableLootBags = CustomizeableLootBags or {}
 
------------------------            ---------------------------
+CustomizeableLootBags.blackList = {
+    ["Base.LootBagRecorder"] = true,
+    ["Base.MysteryLootBag"] = true,
+    ["LootBagRecorder"] = true,
+    ["MysteryLootBag"] = true,
+}
 
-function CustomizeableLootBags.openLootBag(recorder, shouldRemove)
-    if CustomizeableLootBags.isLootBag(recorder) then
-        local pl = getPlayer()
-        local inv = pl:getInventory()
-        local data = recorder:getModData()['LootBagData']
+function CustomizeableLootBags.doRoll()
+	local percent = SandboxVars.CustomizeableLootBags.ItemSpawnChance or 50
+	if percent == 0 then return false end
+	if percent == 100 then return true end
+	return percent >= ZombRand(1, 101)
+end
 
-        if not data then
-            print("Err: Missing LootBagData")
-            return
-        end
-
-        local fType = tostring(data.fType)
-        local strList = tostring(data.strList)
-
-        if getScriptManager():FindItem(fType) then
-            local bag = inv:AddItem(fType)
-            bag:setName(tostring(data.dName))
-            bag:setTexture(getTexture(data.ico))
-            CustomizeableLootBags.spawnStrList(bag, strList)
-        else
-            print("Err: No Such Item ", tostring(fType))
-        end
-
-        if shouldRemove then
-            inv:DoRemoveItem(recorder)
-        end
+function CustomizeableLootBags.trimStr(str)
+    if str:sub(1, 5) == "Item_" then
+        return str:sub(6)
     else
-        print("Err: Missing LootBagData")
+        return str
     end
 end
 
------------------------            ---------------------------
-
-
-function  CustomizeableLootBags.spawnStrList(bag, strList)
-	local pl = getPlayer()
-	local inv = pl:getInventory()
-	local count = 0
-	local limit = SandboxVars.CustomizeableLootBags.MaxItemSpawn or 5
-	if instanceof(bag, "InventoryItem") then
-		if CustomizeableLootBags.isBag(bag) then
-			for var in string.gmatch(strList, "([^;]+)") do
-				local fType, qty = var:match("([^:]+):(%d+)")
-				if fType and qty then
-					if getScriptManager():FindItem(fType) then
-						for i = 1, tonumber(qty) do
-							if count >= limit then return end
-							if CustomizeableLootBags.doRoll() then
-								bag:getInventory():AddItem(fType)
-								count = count + 1
-							end
-						end
-					else
-						print("Err: No Such Item ", tostring(fType))
-					end
-				end
-			end
-		else
-			print("Err: "..tostring(bag:getFullType()).." is not an InventoryContainer")
-		end
-	else
-		print("Err: Invalid Item")
-	end
-end
-
-
-
-
------------------------            ---------------------------
-
-
-function CustomizeableLootBags.openLootBag(recorder, shouldRemove)
-    if CustomizeableLootBags.isLootBag(recorder) then
-        local pl = getPlayer()
-        local inv = pl:getInventory()
-        local data = recorder:getModData()['LootBagData']
-
-        if not data then
-            print("Err: Missing LootBagData")
-            return
-        end
-
-        local fType = tostring(data.fType)
-        local strList = tostring(data.strList)
-
-        if getScriptManager():FindItem(fType) then
-            local bag = inv:AddItem(fType)
-            bag:setName(tostring(data.dName))
-            bag:setTexture(getTexture(data.ico))
-            CustomizeableLootBags.spawnStrList(bag, strList)
-        else
-            print("Err: No Such Item ", tostring(fType))
-        end
-
-        if shouldRemove then
-            inv:DoRemoveItem(recorder)
-        end
-    else
-        print("Err: Missing LootBagData")
+function CustomizeableLootBags.loadBlackList()
+    local addToBlackList = SandboxVars.CustomizeableLootBags.BlackList or ""
+    for entry in string.gmatch(addToBlackList, "([^;]+)") do
+        CustomizeableLootBags.blackList[entry] = true
     end
 end
-
+Events.OnGameStart.Add(CustomizeableLootBags.loadBlackList)

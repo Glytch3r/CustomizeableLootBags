@@ -27,107 +27,121 @@
 
 CustomizeableLootBags = CustomizeableLootBags or {}
 
+
 -----------------------            ---------------------------
+function CustomizeableLootBags.invContext(player, context, items)
+    local pl = getSpecificPlayer(player)
+    local isElevated = isDebugEnabled() or (isClient() and isAdmin())
+    local useAll = false
+    local iconMode = SandboxVars.CustomizeableLootBags.SetIconMode or 3
 
-function CustomizeableLootBags.openLootBag(recorder, shouldRemove)
-    if CustomizeableLootBags.isLootBag(recorder) then
-        local pl = getPlayer()
-        local inv = pl:getInventory()
-        local data = recorder:getModData()['LootBagData']
+    if iconMode == 2 then
+        useAll = true
+    end
 
-        if not data then
-            print("Err: Missing LootBagData")
-            return
+    for _, check in ipairs(items) do
+        local item = nil
+
+        if type(check) == "table" then
+            item = check.items[1]
+        elseif instanceof(check, "InventoryItem") then
+            item = check
         end
 
-        local fType = tostring(data.fType)
-        local strList = tostring(data.strList)
+        if item then
+            local dispName = item:getDisplayName()
 
-        if getScriptManager():FindItem(fType) then
-            local bag = inv:AddItem(fType)
-            bag:setName(tostring(data.dName))
-            bag:setTexture(getTexture(data.ico))
-            CustomizeableLootBags.spawnStrList(bag, strList)
-        else
-            print("Err: No Such Item ", tostring(fType))
-        end
+            if CustomizeableLootBags.isLootBag(item) then
+                local optTip = context:addOptionOnTop("Open Loot Bag: " .. tostring(dispName), worldobjects, function()
+                    CustomizeableLootBags.openLootBag(item, true)
+                    local msg = tostring(item) .. ": " .. tostring(dispName)
+                    pl:addLineChatElement(msg)
+                    print(msg)
+                    pl:playSoundLocal("OpenBag")
+                end)
 
-        if shouldRemove then
-            inv:DoRemoveItem(recorder)
+                local tip = ISInventoryPaneContextMenu.addToolTip()
+                local iconPath = "media/textures/Item_MysteryLootBag_Blue.png"
+                tip.description = "What could be inside?"
+                tip:setName("Open Loot Bag: ")
+                optTip.iconTexture = getTexture(iconPath)
+                tip:setTexture(iconPath)
+                optTip.toolTip = tip
+
+                if isElevated and (iconMode == 2 or iconMode == 1) then
+                    local Main = context:addOptionOnTop("Set Icon: " .. tostring(dispName))
+                    local contextIcon = "media/textures/Item_MysteryLootBag_Green.png"
+                    if useAll then
+                        contextIcon = "media/textures/Item_MysteryLootBag_Yellow.png"
+                    end
+                    Main.iconTexture = getTexture(contextIcon)
+                    local opt = ISContextMenu:getNew(context)
+                    context:addSubMenu(Main, opt)
+                    local items = ScriptManager.instance:getAllItems()
+
+                    for i = 0, items:size() - 1 do
+                        local scr = items:get(i)
+                        local fType = tostring(scr:getModuleName()) .. "." .. tostring(scr:getName())
+                        local ref = InventoryItemFactory.CreateItem(fType)
+
+                        if CustomizeableLootBags.isBag(ref) or useAll then
+                            local ico = ref:getTexture():getName()
+                            local optTip = opt:addOption(CustomizeableLootBags.trimStr(tostring(ico)), worldobjects, function()
+                                item:setTexture(getTexture(ico))
+                                getSoundManager():playUISound("UIActivateMainMenuItem")
+                                context:hideAndChildren()
+                            end)
+                            optTip.iconTexture = getTexture(ico)
+                        end
+                    end
+                end
+            end
+
+            if isElevated then
+                local recorder = nil
+                local bag = nil
+				local isShouldDel = SandboxVars.CustomizeableLootBags.DeleteOriginalBag or false
+                if item:getFullType() == 'Base.LootBagRecorder' then
+                    recorder = item
+                    bag = recorder:getContainer()
+                elseif CustomizeableLootBags.isBag(item) then
+                    bag = item
+                    recorder = item:getContainer():FindAndReturn('Base.LootBagRecorder')
+                end
+
+                if recorder and bag and CustomizeableLootBags.isBag(bag) then
+                    local submenu = context:addOptionOnTop("Set Loot Bag: " .. tostring(dispName))
+                    local subContext = ISContextMenu:getNew(context)
+                    context:addSubMenu(submenu, subContext)
+
+                    local optBag = subContext:addOption("From Bag", worldobjects, function()
+                        CustomizeableLootBags.setLootBag(bag, isShouldDel, recorder)
+                        local msg = tostring(item) .. ": " .. tostring(dispName)
+                        pl:addLineChatElement(msg)
+                        print(msg)
+                        getSoundManager():playUISound("UIActivateMainMenuItem")
+                    end)
+
+                    local optRecorder = subContext:addOption("From Recorder", worldobjects, function()
+                        CustomizeableLootBags.setLootRecord(bag, isShouldDel, recorder)
+                        local msg = tostring(item) .. ": " .. tostring(dispName)
+                        pl:addLineChatElement(msg)
+                        print(msg)
+                        getSoundManager():playUISound("UIActivateMainMenuItem")
+                    end)
+
+                    local tip = ISInventoryPaneContextMenu.addToolTip()
+                    tip:setName("Set Loot Bag: ")
+                    tip.description = tostring(CustomizeableLootBags.getStrList(item))
+                    local iconPath = "media/textures/Item_MysteryLootBag_Red.png"
+                    submenu.iconTexture = getTexture(iconPath)
+                    tip:setTexture(iconPath)
+                    submenu.toolTip = tip
+                end
+            end
         end
-    else
-        print("Err: Missing LootBagData")
     end
 end
 
------------------------            ---------------------------
-
-
-function  CustomizeableLootBags.spawnStrList(bag, strList)
-	local pl = getPlayer()
-	local inv = pl:getInventory()
-	local count = 0
-	local limit = SandboxVars.CustomizeableLootBags.MaxItemSpawn or 5
-	if instanceof(bag, "InventoryItem") then
-		if CustomizeableLootBags.isBag(bag) then
-			for var in string.gmatch(strList, "([^;]+)") do
-				local fType, qty = var:match("([^:]+):(%d+)")
-				if fType and qty then
-					if getScriptManager():FindItem(fType) then
-						for i = 1, tonumber(qty) do
-							if count >= limit then return end
-							if CustomizeableLootBags.doRoll() then
-								bag:getInventory():AddItem(fType)
-								count = count + 1
-							end
-						end
-					else
-						print("Err: No Such Item ", tostring(fType))
-					end
-				end
-			end
-		else
-			print("Err: "..tostring(bag:getFullType()).." is not an InventoryContainer")
-		end
-	else
-		print("Err: Invalid Item")
-	end
-end
-
-
-
-
------------------------            ---------------------------
-
-
-function CustomizeableLootBags.openLootBag(recorder, shouldRemove)
-    if CustomizeableLootBags.isLootBag(recorder) then
-        local pl = getPlayer()
-        local inv = pl:getInventory()
-        local data = recorder:getModData()['LootBagData']
-
-        if not data then
-            print("Err: Missing LootBagData")
-            return
-        end
-
-        local fType = tostring(data.fType)
-        local strList = tostring(data.strList)
-
-        if getScriptManager():FindItem(fType) then
-            local bag = inv:AddItem(fType)
-            bag:setName(tostring(data.dName))
-            bag:setTexture(getTexture(data.ico))
-            CustomizeableLootBags.spawnStrList(bag, strList)
-        else
-            print("Err: No Such Item ", tostring(fType))
-        end
-
-        if shouldRemove then
-            inv:DoRemoveItem(recorder)
-        end
-    else
-        print("Err: Missing LootBagData")
-    end
-end
-
+Events.OnFillInventoryObjectContextMenu.Remove(CustomizeableLootBags.invContext)
+Events.OnFillInventoryObjectContextMenu.Add(CustomizeableLootBags.invContext)

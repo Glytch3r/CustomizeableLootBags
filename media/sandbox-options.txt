@@ -18,14 +18,23 @@ option CustomizeableLootBags.ShowContentsTooltip
 	page = CustomizeableLootBags, translation = CustomizeableLootBags_ShowContentsTooltip,
 }
 
-option CustomizeableLootBags.CanUseAllIcons
-{
-	type = boolean, default = false,
-	page = CustomizeableLootBags, translation = CustomizeableLootBags_CanUseAllIcons,
-}
-
 option CustomizeableLootBags.DeleteOriginalBag
 {
 	type = boolean, default = false,
 	page = CustomizeableLootBags, translation = CustomizeableLootBags_DeleteOriginalBag,
 }
+
+option CustomizeableLootBags.SetIconMode
+{
+    type = enum,    numValues = 3,    default = 1,
+    page = CustomizeableLootBags,    translation = CustomizeableLootBags_SetIconMode,
+	valueTranslation = CustomizeableLootBags_SetIconMode,
+}
+
+
+option CustomizeableLootBags.BlackList
+{
+	type = string, default = Base.Key1;Base.Key2;Base.Key3;Base.Key4;Base.Key5,
+	page = CustomizeableLootBags, translation = CustomizeableLootBags_BlackList,
+}
+
