@@ -28,7 +28,7 @@
 CustomizeableLootBags = CustomizeableLootBags or {}
 
 -----------------------            ---------------------------
-
+--[[
 function CustomizeableLootBags.openLootBag(recorder, shouldRemove)
     if CustomizeableLootBags.isLootBag(recorder) then
         local pl = getPlayer()
@@ -59,7 +59,7 @@ function CustomizeableLootBags.openLootBag(recorder, shouldRemove)
         print("Err: Missing LootBagData")
     end
 end
-
+ ]]
 -----------------------            ---------------------------
 
 
@@ -102,8 +102,20 @@ end
 
 function CustomizeableLootBags.openLootBag(recorder, shouldRemove)
     if CustomizeableLootBags.isLootBag(recorder) then
-        local pl = getPlayer()
+		local pl = getPlayer()
         local inv = pl:getInventory()
+
+		local reqItem = SandboxVars.CustomizeableLootBags.RequiredItem or "Base.CreditCard"
+		local bagKey = inv:FindAndReturn(reqItem)
+
+		if shouldRemove then
+			inv:DoRemoveItem(recorder)
+		end
+		if not bagKey then
+			return
+		end
+		inv:DoRemoveItem(bagKey)
+
         local data = recorder:getModData()['LootBagData']
 
         if not data then
@@ -123,9 +135,8 @@ function CustomizeableLootBags.openLootBag(recorder, shouldRemove)
             print("Err: No Such Item ", tostring(fType))
         end
 
-        if shouldRemove then
-            inv:DoRemoveItem(recorder)
-        end
+
+
     else
         print("Err: Missing LootBagData")
     end

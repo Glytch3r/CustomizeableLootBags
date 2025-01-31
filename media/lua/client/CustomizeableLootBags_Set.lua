@@ -48,7 +48,7 @@ function CustomizeableLootBags.setLootBag(bag, shouldRemove, recorder)
         recorder:getModData()['LootBagData'].strList =  strList
         recorder:getModData()['LootBagData'].fType =  fType
         recorder:getModData()['LootBagData'].ico = tostring(ico)
-        recorder:getModData()['LootBagData'].dName = tostring(dName)
+        recorder:getModData()['LootBagData'].dName = "Loot Bag: ".. tostring(dName)
         recorder:setName(dName)
         CustomizeableLootBags.setIcon(recorder, ico)
         if showTip then
@@ -73,7 +73,7 @@ function CustomizeableLootBags.setLootRecord(bag, shouldRemove, recorder)
         recorder:getModData()['LootBagData'].strList = tostring(CustomizeableLootBags.getStrList(bag))
         recorder:getModData()['LootBagData'].fType = bag:getFullType()
         recorder:getModData()['LootBagData'].ico = tostring(ico)
-        recorder:getModData()['LootBagData'].dName = tostring(dName)
+        recorder:getModData()['LootBagData'].dName = "Loot Bag: ".. tostring(dName)
 
         recorder:setName(dName)
         CustomizeableLootBags.setIcon(recorder, ico)

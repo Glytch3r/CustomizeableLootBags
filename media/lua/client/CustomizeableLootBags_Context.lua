@@ -53,6 +53,8 @@ function CustomizeableLootBags.invContext(player, context, items)
             local dispName = item:getDisplayName()
 
             if CustomizeableLootBags.isLootBag(item) then
+				local reqItem = SandboxVars.CustomizeableLootBags.RequiredItem or "Base.CreditCard"
+
                 local optTip = context:addOptionOnTop("Open Loot Bag: " .. tostring(dispName), worldobjects, function()
                     CustomizeableLootBags.openLootBag(item, true)
                     local msg = tostring(item) .. ": " .. tostring(dispName)
@@ -67,7 +69,13 @@ function CustomizeableLootBags.invContext(player, context, items)
                 tip:setName("Open Loot Bag: ")
                 optTip.iconTexture = getTexture(iconPath)
                 tip:setTexture(iconPath)
-                optTip.toolTip = tip
+				tip.description = "What could be inside?"
+
+				if not CustomizeableLootBags.isCanOpen() then
+					tip.description = tostring(reqItem) .." is Required to open loot bag"
+					optTip.notAvailable = true
+				end
+				optTip.toolTip = tip
 
                 if isElevated and (iconMode == 2 or iconMode == 1) then
                     local Main = context:addOptionOnTop("Set Icon: " .. tostring(dispName))
@@ -105,7 +113,8 @@ function CustomizeableLootBags.invContext(player, context, items)
 
                 if item:getFullType() == recorderFtype then
                     recorder = item
-                    bag = recorder:getContainer()
+                    bag = recorder:getContainer():getContainingItem() or recorder:getContainer()
+
                 elseif CustomizeableLootBags.isBag(item) then
                     bag = item
                     recorder = item:getContainer():FindAndReturn(recorderFtype)
@@ -115,7 +124,6 @@ function CustomizeableLootBags.invContext(player, context, items)
 					local isHasRecord = CustomizeableLootBags.isHasLootBagData(recorder)
 
 					local dupRec = context:addOptionOnTop("Duplicate Recorder: ")
-
 					local opt = ISContextMenu:getNew(context)
 					context:addSubMenu(dupRec, opt)
 					if not isHasRecord then
@@ -140,11 +148,12 @@ function CustomizeableLootBags.invContext(player, context, items)
 					end
 
 					if bag and CustomizeableLootBags.isBag(bag) then
-						local submenu = context:addOptionOnTop("Set Loot Bag: " .. tostring(dispName))
-						local subContext = ISContextMenu:getNew(context)
-						context:addSubMenu(submenu, subContext)
 
-						local optBag = subContext:addOption("From Bag", worldobjects, function()
+					--[[ 	local submenu = context:addOptionOnTop("Set Loot Bag: " .. tostring(dispName))
+						local subContext = ISContextMenu:getNew(context)
+						context:addSubMenu(submenu, subContext) ]]
+
+		--[[ 				local optBag = context:addOption("Record Loot Bag", worldobjects, function()
 							CustomizeableLootBags.setLootBag(bag, isShouldDel, recorder)
 							local msg = tostring(item) .. ": " .. tostring(dispName)
 							pl:addLineChatElement(msg)
@@ -152,27 +161,38 @@ function CustomizeableLootBags.invContext(player, context, items)
 							getSoundManager():playUISound("UIActivateMainMenuItem")
 						end)
 
-						local optRecorder = subContext:addOption("From Recorder", worldobjects, function()
-							CustomizeableLootBags.setLootRecord(bag, isShouldDel, recorder)
-							local msg = tostring(item) .. ": " .. tostring(dispName)
-							pl:addLineChatElement(msg)
-							print(msg)
-							getSoundManager():playUISound("UIActivateMainMenuItem")
-						end)
+ ]]
+						local alreadyHasData =  CustomizeableLootBags.isHasLootBagData(recorder)
+						if not alreadyHasData  then
+							local optRecorder = context:addOptionOnTop("Record", worldobjects, function()
+								CustomizeableLootBags.setLootRecord(bag, isShouldDel, recorder)
+								local msg = tostring(item) .. ": " .. tostring(dispName)
+								pl:addLineChatElement(msg)
+								print(msg)
+								getSoundManager():playUISound("UIActivateMainMenuItem")
+							end)
 
-						local tip = ISInventoryPaneContextMenu.addToolTip()
-						tip:setName("Set Loot Bag: ")
-						tip.description = tostring(CustomizeableLootBags.getStrList(item))
-						local iconPath = "media/textures/Item_MysteryLootBag_Red.png"
-						submenu.iconTexture = getTexture(iconPath)
-						tip:setTexture(iconPath)
-						submenu.toolTip = tip
+
+							local tip = ISInventoryPaneContextMenu.addToolTip()
+							tip:setName("Record Loot Bag Data: ")
+						--	tip.description = tostring(CustomizeableLootBags.getStrList(item))
+							local iconPath = "media/textures/Item_MysteryLootBag_Red.png"
+							optRecorder.iconTexture = getTexture(iconPath)
+							tip:setTexture(iconPath)
+
+							local isInside =  CustomizeableLootBags.isInsideInventoryContainer(recorder)
+							if not isInside then
+								optRecorder.notAvailable = true
+								optRecorder.toolTip:setName("Should be inside InventoryContainer")
+								optRecorder.toolTip = tip
+							end
+						end
 					end
 				end
             end
         end
     end
 end
-
 Events.OnFillInventoryObjectContextMenu.Remove(CustomizeableLootBags.invContext)
 Events.OnFillInventoryObjectContextMenu.Add(CustomizeableLootBags.invContext)
+print(CustomizeableLootBags.isHasLootBagData(dbgItem))

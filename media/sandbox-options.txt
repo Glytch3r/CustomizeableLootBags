@@ -38,3 +38,8 @@ option CustomizeableLootBags.BlackList
 	page = CustomizeableLootBags, translation = CustomizeableLootBags_BlackList,
 }
 
+option CustomizeableLootBags.RequiredItem
+{
+	type = string, default = Base.CreditCard,
+	page = CustomizeableLootBags, translation = CustomizeableLootBags_RequiredItem,
+}

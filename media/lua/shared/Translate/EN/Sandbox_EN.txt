@@ -26,5 +26,9 @@ Sandbox_EN = {
 	Sandbox_CustomizeableLootBags_BlackList = "Blacklist",
 	Sandbox_CustomizeableLootBags_BlackList_tooltip = "Exclude blacklisted items when creating LootBagData . Use ; as delimiter",
 
+	Sandbox_CustomizeableLootBags_RequiredItem = "Required Item",
+	Sandbox_CustomizeableLootBags_RequiredItem_tooltip = "Item that is required to open loot bags",
+
+
 }
 
