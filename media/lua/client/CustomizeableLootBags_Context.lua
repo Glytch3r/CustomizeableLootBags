@@ -34,6 +34,7 @@ function CustomizeableLootBags.invContext(player, context, items)
     local isElevated = isDebugEnabled() or (isClient() and isAdmin())
     local useAll = false
     local iconMode = SandboxVars.CustomizeableLootBags.SetIconMode or 3
+	local recorderFtype = 'Base.LootBagRecorder'
 
     if iconMode == 2 then
         useAll = true
@@ -101,43 +102,68 @@ function CustomizeableLootBags.invContext(player, context, items)
                 local recorder = nil
                 local bag = nil
 				local isShouldDel = SandboxVars.CustomizeableLootBags.DeleteOriginalBag or false
-                if item:getFullType() == 'Base.LootBagRecorder' then
+
+                if item:getFullType() == recorderFtype then
                     recorder = item
                     bag = recorder:getContainer()
                 elseif CustomizeableLootBags.isBag(item) then
                     bag = item
-                    recorder = item:getContainer():FindAndReturn('Base.LootBagRecorder')
+                    recorder = item:getContainer():FindAndReturn(recorderFtype)
                 end
 
-                if recorder and bag and CustomizeableLootBags.isBag(bag) then
-                    local submenu = context:addOptionOnTop("Set Loot Bag: " .. tostring(dispName))
-                    local subContext = ISContextMenu:getNew(context)
-                    context:addSubMenu(submenu, subContext)
+                if recorder then
 
-                    local optBag = subContext:addOption("From Bag", worldobjects, function()
-                        CustomizeableLootBags.setLootBag(bag, isShouldDel, recorder)
-                        local msg = tostring(item) .. ": " .. tostring(dispName)
-                        pl:addLineChatElement(msg)
-                        print(msg)
-                        getSoundManager():playUISound("UIActivateMainMenuItem")
-                    end)
+					local dupRec = context:addOptionOnTop("Duplicate Recorder: ")
+					dupRec.iconTexture = getTexture("media/ui/MysteryLootBag_Dup.png")
+					local opt = ISContextMenu:getNew(context)
+					context:addSubMenu(dupRec, opt)
+					MysteryLootBag_Dup
+					opt:addOption("[ x1 ]", worldobjects, function()
+						CustomizeableLootBags.duplicateRecord(recorder, 1)
+					end)
+					opt:addOption("[ x2 ]", worldobjects, function()
+						CustomizeableLootBags.duplicateRecord(recorder, 2)
+					end)
+					opt:addOption("[ x5 ]", worldobjects, function()
+						CustomizeableLootBags.duplicateRecord(recorder, 5)
+					end)
+					opt:addOption("[ x10 ]", worldobjects, function()
+						CustomizeableLootBags.duplicateRecord(recorder, 10)
+					end)
+					opt:addOption("[ x25 ]", worldobjects, function()
+						CustomizeableLootBags.duplicateRecord(recorder, 25)
+					end)
 
-                    local optRecorder = subContext:addOption("From Recorder", worldobjects, function()
-                        CustomizeableLootBags.setLootRecord(bag, isShouldDel, recorder)
-                        local msg = tostring(item) .. ": " .. tostring(dispName)
-                        pl:addLineChatElement(msg)
-                        print(msg)
-                        getSoundManager():playUISound("UIActivateMainMenuItem")
-                    end)
+					if bag and CustomizeableLootBags.isBag(bag) then
+						local submenu = context:addOptionOnTop("Set Loot Bag: " .. tostring(dispName))
+						local subContext = ISContextMenu:getNew(context)
+						context:addSubMenu(submenu, subContext)
 
-                    local tip = ISInventoryPaneContextMenu.addToolTip()
-                    tip:setName("Set Loot Bag: ")
-                    tip.description = tostring(CustomizeableLootBags.getStrList(item))
-                    local iconPath = "media/textures/Item_MysteryLootBag_Red.png"
-                    submenu.iconTexture = getTexture(iconPath)
-                    tip:setTexture(iconPath)
-                    submenu.toolTip = tip
-                end
+						local optBag = subContext:addOption("From Bag", worldobjects, function()
+							CustomizeableLootBags.setLootBag(bag, isShouldDel, recorder)
+							local msg = tostring(item) .. ": " .. tostring(dispName)
+							pl:addLineChatElement(msg)
+							print(msg)
+							getSoundManager():playUISound("UIActivateMainMenuItem")
+						end)
+
+						local optRecorder = subContext:addOption("From Recorder", worldobjects, function()
+							CustomizeableLootBags.setLootRecord(bag, isShouldDel, recorder)
+							local msg = tostring(item) .. ": " .. tostring(dispName)
+							pl:addLineChatElement(msg)
+							print(msg)
+							getSoundManager():playUISound("UIActivateMainMenuItem")
+						end)
+
+						local tip = ISInventoryPaneContextMenu.addToolTip()
+						tip:setName("Set Loot Bag: ")
+						tip.description = tostring(CustomizeableLootBags.getStrList(item))
+						local iconPath = "media/textures/Item_MysteryLootBag_Red.png"
+						submenu.iconTexture = getTexture(iconPath)
+						tip:setTexture(iconPath)
+						submenu.toolTip = tip
+					end
+				end
             end
         end
     end

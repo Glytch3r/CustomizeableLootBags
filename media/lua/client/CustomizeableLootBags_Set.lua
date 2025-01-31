@@ -60,6 +60,7 @@ function CustomizeableLootBags.setLootBag(bag, shouldRemove, recorder)
     end
 end
 -----------------------            ---------------------------
+
 function CustomizeableLootBags.setLootRecord(bag, shouldRemove, recorder)
     if CustomizeableLootBags.isBag(bag) then
         local showTip = SandboxVars.CustomizeableLootBags.ShowContentsTooltip or true

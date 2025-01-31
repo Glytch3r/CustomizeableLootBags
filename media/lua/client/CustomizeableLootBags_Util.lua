@@ -48,6 +48,32 @@ function CustomizeableLootBags.trimStr(str)
         return str
     end
 end
+function CustomizeableLootBags.duplicateRecord(recorder, qty)
+    getSoundManager():playUISound("UIActivateMainMenuItem")
+    local showTip = SandboxVars.CustomizeableLootBags.ShowContentsTooltip or true
+    if recorder:hasModData() then
+        local modData = recorder:getModData()
+        local data = modData['LootBagData']
+        if data then
+            local inv = recorder:getContainer()
+            local fType = recorder:getFullType()
+            for i = 1, qty do
+                local item = inv:AddItem(tostring(fType))
+
+                for k, v in pairs(modData) do
+                    item:getModData()[k] = v
+                end
+
+                item:setName(tostring(data.dName))
+                CustomizeableLootBags.setIcon(item, data.ico)
+
+                if showTip then
+                    item:setTooltip("Spawns: "..tostring(data.strList))
+                end
+            end
+        end
+    end
+end
 
 function CustomizeableLootBags.loadBlackList()
     local addToBlackList = SandboxVars.CustomizeableLootBags.BlackList or ""
@@ -56,3 +82,5 @@ function CustomizeableLootBags.loadBlackList()
     end
 end
 Events.OnGameStart.Add(CustomizeableLootBags.loadBlackList)
+
+

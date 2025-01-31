@@ -33,14 +33,13 @@ function  CustomizeableLootBags.isBag(item)
 	return instanceof(item, "InventoryItem") and (instanceof(item, "InventoryContainer") or item:getCategory() == "Container")
 end
 
-function  CustomizeableLootBags.isLootBag(ref)
-    local bool = false
-    if ref:hasModData() then
-        if ref:getModData()['LootBagData'] ~= nil then
-            bool = true
-        end
-    end
-    return bool
+function CustomizeableLootBags.isLootBagTemplate(ref)
+    local modData = ref:getModData()['LootBagData']
+    return modData and modData.isTemplate ~= nil
 end
 
+function CustomizeableLootBags.isLootBag(ref)
+    local modData = ref:getModData()['LootBagData']
+    return modData and modData.isTemplate == nil
+end
 
